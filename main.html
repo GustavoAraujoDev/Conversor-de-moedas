@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Conversor de Moedas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    input, select, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 20px;
+    }
+
+    #resultado {
+      border: 2px solid #333;
+      width: 300px;
+      height: 50px;
+      font-size: 25px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Conversor de Moedas</h1>
+  <p>Digite o valor em reais:</p>
+  <input type="number" id="valor" min="0" step="0.01">
+  <p>Escolha a moeda de destino:</p>
+  <select id="moeda">
+    <option value="USD">Dólar Americano</option>
+    <option value="EUR">Euro</option>
+    <option value="GBP">Libra Esterlina</option>
+    <option value="JPY">Iene Japonês</option>
+    <option value="CAD">Dólar Canadense</option>
+    <option value="AUD">Dólar Australiano</option>
+  </select>
+  <p>Clique no botão para converter:</p>
+  <button id="converter">Converter</button>
+  <p>Resultado:</p>
+  <input type="text" id="resultado" readonly>
+  <script>
+    // Seleciona os elementos da página
+    var valor = document.getElementById("valor");
+    var moeda = document.getElementById("moeda");
+    var converter = document.getElementById("converter");
+    var resultado = document.getElementById("resultado");
+
+    // Define a URL da API de câmbio
+    var url = "https://api.exchangerate.host/latest?base=BRL";
+
+    // Cria uma função para converter o valor
+    function converterValor() {
+      // Obtém o valor em reais
+      var reais = Number(valor.value);
+
+      // Verifica se o valor é válido
+      if (isNaN(reais) || reais <= 0) {
+        alert("Digite um valor válido!");
+        return;
+      }
+
+      // Obtém a moeda de destino
+      var destino = moeda.value;
+
+      // Faz uma requisição para a API de câmbio
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", url);
+      xhr.onload = function() {
+        // Verifica se a requisição foi bem sucedida
+        if (xhr.status == 200) {
+          // Converte a resposta em JSON
+          var dados = JSON.parse(xhr.responseText);
+
+          // Obtém a taxa de câmbio da moeda de destino
+          var taxa = dados.rates[destino];
+
+          // Calcula o valor convertido
+          var convertido = reais * taxa;
+
+          // Formata o valor com duas casas decimais
+          var formatado = convertido.toFixed(2);
+
+          // Exibe o resultado na caixa de texto
+          resultado.value = formatado + " " + destino;
+        } else {
+          // Exibe uma mensagem de erro
+          alert("Erro ao obter as taxas de câmbio!");
+        }
+      };
+      xhr.send();
+    }
+
+    // Adiciona um evento de clique no botão
+    converter.addEventListener("click", converterValor);
+  </script>
+</body>
+</html>
